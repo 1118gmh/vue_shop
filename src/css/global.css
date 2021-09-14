@@ -5,3 +5,7 @@ body,
   padding: 0;
   height: 100%;
 }
+.el-breadcrumb{
+  margin-bottom: 15px;
+  font-size: 12px !important;
+}

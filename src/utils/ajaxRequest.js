@@ -18,8 +18,8 @@ class AjaxRequest {
   setInterceptor(instance, url) {
     instance.interceptors.request.use(
       config => {
-        // 每次请求前，将token放到请求中
-        config.headers.token = sessionStorage.getItem('token')
+        // 每次请求前，将token放到请求中 Authorization（后根据这个属性获取token来判断）
+        config.headers.Authorization = sessionStorage.getItem('token')
 
         // 请求前显示loading
         // if (Object.keys(this.queue).length === 0) {

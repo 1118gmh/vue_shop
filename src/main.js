@@ -2,6 +2,7 @@
 import './css/global.css'
 // 引入fontcss
 import './assets/font/iconfont.css'
+import './assets/fonts/iconfont.css'
 
 import Vue from 'vue'
 import App from './App.vue'
