@@ -42,6 +42,18 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 - 退出登录 就清除token信息 并且路由跳转login页面
 ```
 
+2. 首页的布局和绘制
+
+```
+- 通过el-container布局容器来布局head、aside、main
+- head使用flex布局左右两栏，aside使用el-menu，
+- 左侧菜单通过axios获取数据，失败提示失败信息，成功，则通过v-for绑定到组件中
+- 左侧菜单的展开与折叠，先配置el-menu的collapse属性并且取消折叠特效，然后aside的width随之变化
+- 当访问home时，需要重定向到home的子路由welcome,创建welcome组件，配置子路由，home中在ul-main容器里添加router-view，home路由redirect重定向到welcome
+- 开启ul-emun的路由模式，router，它是根据index的值作为路由的路径，来跳转路由的
+- 页面的路由激活高亮效果的保持，当点击二级菜单时，设置ul-enum的default-active值为当前路由路径，并且通过sessionStorage存储路由路径，当beforecreate时设置default-active的值为sessionStorage中的路由路径值，
+```
+
 ### notes
 
 1. 语法处理：eslint 规范+prettier 格式化文件
