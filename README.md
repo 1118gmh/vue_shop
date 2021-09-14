@@ -93,3 +93,19 @@ module.exports = {
   "singleQuote": true // 格式化后变为单引号
 }
 ```
+
+2. element-ui 组件的按需导入
+
+```
+import {
+  Button,
+  Message,
+  Confirm
+} from 'element-ui'
+
+
+Vue.use(Buttom)  // 通过标签使用
+
+Vue.prototype.$message = Message  //挂载到组件上使用
+Vue.prototype.$confirm = Confirm
+```
