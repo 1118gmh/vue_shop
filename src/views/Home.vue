@@ -72,6 +72,11 @@ export default {
       activePath: ''
     }
   },
+  watch: {
+    $route(to, from) {
+      this.activePath = to.path
+    }
+  },
   async created() {
     this.getMenus()
     this.activePath = window.sessionStorage.getItem('activePath')

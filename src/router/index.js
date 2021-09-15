@@ -32,6 +32,18 @@ const routes = [
         name: 'Users',
         component: () =>
           import(/* webpackChunkName: "user" */ '../views/user/Users.vue')
+      },
+      {
+        path: '/rights',
+        name: 'Rights',
+        component: () =>
+          import(/* webpackChunkName: "home" */ '../views/power/Rights.vue')
+      },
+      {
+        path: '/roles',
+        name: 'Roles',
+        component: () =>
+          import(/* webpackChunkName: "home" */ '../views/power/Roles.vue')
       }
     ]
   }
