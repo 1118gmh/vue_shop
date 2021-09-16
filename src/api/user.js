@@ -35,3 +35,11 @@ export const deleteUser = id =>
     method: 'delete',
     url: `users/${id}`
   })
+export const setUserRole = (id, rid) =>
+  axios.request({
+    method: 'put',
+    url: `users/${id}/role`,
+    data: {
+      rid: rid
+    }
+  })

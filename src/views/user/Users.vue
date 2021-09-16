@@ -76,6 +76,7 @@
                 type="warning"
                 icon="el-icon-setting"
                 size="mini"
+                @click="clickRoleButton(scope.row)"
               ></el-button>
             </el-tooltip>
           </template>
@@ -153,6 +154,31 @@
         <el-button type="primary" @click="fixUser">确 定</el-button>
       </span>
     </el-dialog>
+    <!-- 给用户分配角色的对话框 -->
+    <el-dialog
+      title="分配角色"
+      :visible.sync="setRoleDialog"
+      width="50%"
+      @close="closeSetRoleDialog"
+    >
+      <div>
+        <p>当前用户：{{ userInfo.username }}</p>
+        <p>用户角色：{{ userInfo.role_name }}</p>
+        <el-select v-model="currentRoleId" placeholder="请选择">
+          <el-option
+            v-for="item in rolesOptions"
+            :key="item.id"
+            :label="item.roleName"
+            :value="item.id"
+          >
+          </el-option>
+        </el-select>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="setRoleDialog = false">取 消</el-button>
+        <el-button type="primary" @click="commitFixRoleRight">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -163,8 +189,10 @@ import {
   addOneUser,
   fixUser,
   getOneUser,
-  deleteUser
+  deleteUser,
+  setUserRole
 } from '../../api/user'
+import { getRolesData } from '../../api/rights'
 export default {
   data() {
     var checkEmail = (rule, value, callback) => {
@@ -215,13 +243,47 @@ export default {
         ]
       },
       dialogVisible2: false,
-      fixForm: {}
+      fixForm: {},
+      // 设置用户角色对话框
+      setRoleDialog: false,
+      // 点击角色按钮时获取当前的用户
+      userInfo: {},
+      // 选择器当前选中的角色
+      currentRoleId: '',
+      // 所有的角色信息
+      rolesOptions: []
     }
   },
   created() {
     this.getUsers()
   },
   methods: {
+    closeSetRoleDialog() {
+      this.userInfo = {}
+      this.currentRoleId = ''
+      this.rolesOptions = []
+    },
+    async commitFixRoleRight() {
+      const res = await setUserRole(this.userInfo.id, this.currentRoleId)
+      if (res.meta.status !== 200) {
+        return this.$message.error(res.meta.msg)
+      }
+      this.$message.success(res.meta.msg)
+      this.getUsers()
+      this.setRoleDialog = false
+    },
+    async clickRoleButton(role) {
+      // 获取当前角色
+      this.userInfo = role
+      // 获取所有的角色
+      const res = await getRolesData()
+      if (res.meta.status !== 200) {
+        return this.$message.error('获取角色列表失败')
+      }
+      this.rolesOptions = res.data
+      // 让对话框显示
+      this.setRoleDialog = true
+    },
     // 删除用户提示，防止误操作
     deleteMessage(id) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {

@@ -80,7 +80,11 @@
               @click="deleteRole(scope.row.id)"
               >删除</el-button
             >
-            <el-button size="mini" type="warning" icon="el-icon-setting"
+            <el-button
+              size="mini"
+              type="warning"
+              icon="el-icon-setting"
+              @click="showAuthDialog(scope.row)"
               >分配权限</el-button
             >
           </template>
@@ -140,27 +144,58 @@
         <el-button type="primary" @click="commitDialog2">确 定</el-button>
       </span>
     </el-dialog>
+
+    <!-- 分配权限对话框 -->
+    <el-dialog
+      title="分配权限"
+      :visible.sync="authDialog"
+      width="50%"
+      @close="closeAuthDialog"
+    >
+      <!-- 树型结构，所有 权限 -->
+      <el-tree
+        ref="tree"
+        :data="authData"
+        show-checkbox
+        node-key="id"
+        :default-expanded-keys="defaultArray"
+        :default-expand-all="true"
+        :default-checked-keys="defaultArray"
+        :props="defaultProps"
+      >
+      </el-tree>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="authDialog = false">取 消</el-button>
+        <el-button type="primary" @click="commitAuthDialog">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
 import BreadCrumb from '@/components/BreadCrumb'
 import {
+  getRights,
   getRolesData,
   addRoles,
   getRoleById,
   editRole,
   deleteRole,
-  deleteAuth
+  deleteAuth,
+  fixRoleRights
 } from '@/api/rights'
 export default {
   data() {
     return {
+      // 角色数据
       rolesData: [],
+      // 添加角色对话框
       dialogVisible: false,
+      // 添加角色表单组件数据
       rolesForm: {
         roleName: '',
         roleDesc: ''
       },
+      // 表单组件验证规则
       rolesRules: {
         roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' },
@@ -171,8 +206,23 @@ export default {
           { min: 2, max: 20, message: '长度在 2 到 20 个字符', trigger: 'blur' }
         ]
       },
+      // 编辑角色对话框
       dialogVisible2: false,
-      rolesForm2: {}
+      // 编辑角色表单数据
+      rolesForm2: {},
+      // 分配权限对话框
+      authDialog: false,
+      // 树形控件绑定的数据
+      authData: [],
+      // 树形控件属性绑定对象
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
+      },
+      // 树形控件默认绑定的数据(根据authData中的id来绑定默认选中的)
+      defaultArray: [],
+      // 当点击分配权限时的用户ID,用于用户授权
+      roleId: ''
     }
   },
   created() {
@@ -182,6 +232,49 @@ export default {
     BreadCrumb
   },
   methods: {
+    async commitAuthDialog() {
+      // 全选的key
+      const checkedRights = this.$refs.tree.getCheckedKeys()
+      // 半选的key
+      const halfCheckedRights = this.$refs.tree.getHalfCheckedKeys()
+      const authString =
+        checkedRights.join(',') + ',' + halfCheckedRights.join(',')
+      console.log(this.roleId, authString)
+      const res = await fixRoleRights(this.roleId, authString)
+      if (res.meta.status !== 200) {
+        return this.$message.error('分配权限失败')
+      }
+      this.$message.success(res.meta.msg)
+      this.authDialog = false
+      this.getRolesData()
+    },
+    closeAuthDialog() {
+      this.defaultArray = []
+      this.roleId = ''
+    },
+    getAllAuthIDByRole(node, arr) {
+      if (!node.children) {
+        arr.push(node.id)
+        return
+      }
+      node.children.forEach(item => this.getAllAuthIDByRole(item, arr))
+    },
+    async showAuthDialog(role) {
+      // 获取所有权限数据
+      const res = await getRights('tree')
+      if (res.meta.status !== 200) {
+        this.$message.error('获取数据失败')
+        return
+      }
+      this.authData = res.data
+      // 获取默认绑定的权限
+      this.getAllAuthIDByRole(role, this.defaultArray)
+      // if(res.meta.status !== 200){}
+      // 打开对话框
+      this.authDialog = true
+      // 获取到roleId数据，用于角色授权
+      this.roleId = role.id
+    },
     // 根据id删除对应的权限，删除需要弹框提示
     removeRightById(role, authId) {
       this.$confirm('此操作将永久删除，是否继续？', '提示', {

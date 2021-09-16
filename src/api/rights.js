@@ -41,3 +41,11 @@ export const deleteAuth = (roleId, authId) =>
     method: 'delete',
     url: `roles/${roleId}/rights/${authId}`
   })
+export const fixRoleRights = (roleId, rids) =>
+  axios.request({
+    method: 'post',
+    url: `roles/${roleId}/rights`,
+    data: {
+      rids: rids
+    }
+  })
