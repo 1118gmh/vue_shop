@@ -71,6 +71,31 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 - 当点击修改用户按钮的时候，弹出对话框，需要发送put请求。。。
 - 当点击删除用户按钮的时候，需要发送delete请求，在发送之前，要通过弹框再一次确认用户是否要删除，防止误删除
 - 当点击设置按钮时tooltip文字提示来提示用户这个按钮时做啥的。
+
+```
+
+4. 权限管理
+
+```
+- 权限列表中的权限等级：根据当前juese的level值来显示不同的tag标签
+- 点击'>'展示当前用户拥有的权限：通过<el-table-column type="expand"></el-table-column> 指定type属性为expand来是实现表格的点击下拉展示，通过插槽插入栏栅布局搭建结构，并且v-for循环绑定当前角色的children数据
+- 添加角色操作：点击添加角色按钮，弹出（有表单的）对话框，点击确定时，发送post请求，当正确地返回了结果之后，提示用户、关闭对话框，更新列表
+- 删除角色权限，点击'X'，先弹出是否确认删除的弹框，防止误删，当确定之后，发送delete请求，会返回当前角色的权限数据，直接通过role.children = res.data就可以了，（因为role是对象，指向的是堆内存，操作它可以直接改变堆内存中数据）
+- 分配权限操作：点击分配权限，树形结构展示数据，发送请求获取所有的权限、递归获取所有当前角色的权限、弹出分配权限的对话框、获取用户的id（因为提交时要根据id给用户授权）。
+
+- 用户列表中的分配角色操作：点击分配角色，弹出对话框，获取当前用户的角色信息并显示，获取所有角色信息并且绑定到下拉框中，确定时，根据下拉框选择的数据发送请求，更改用户的角色
+```
+
+5. 商品管理
+
+```
+- 商品分配的结构展示： table + tree 结构（通过npm install vue-table-with-tree-grid插件实现）
+  // 导入
+  import TreeTable from 'vue-cli-plugin-element-ui'
+  // 注册
+  Vue.component('tree-table', TreeTable) 或者  Vue.use(TreeTable)
+  //使用
+  根据 api 文档查看使用
 ```
 
 ### notes

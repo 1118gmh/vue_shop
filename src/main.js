@@ -10,10 +10,14 @@ import router from './router'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
 
+import TreeTable from 'vue-table-with-tree-grid'
+
 import filters from '@/utils/filters'
 for (const key in filters) {
   Vue.filter(key, filters[key])
 }
+
+Vue.component('tree-table', TreeTable)
 Vue.use(ElementUI)
 
 Vue.config.productionTip = false
