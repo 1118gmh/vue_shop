@@ -52,6 +52,12 @@ const routes = [
           import(
             /* webpackChunkName: "categories" */ '../views/good/Categories.vue'
           )
+      },
+      {
+        path: '/params',
+        name: 'Params',
+        component: () =>
+          import(/* webpackChunkName: "params" */ '../views/good/Params.vue')
       }
     ]
   }

@@ -28,3 +28,12 @@ export const deleteCategories = id =>
     method: 'delete',
     url: `categories/${id}`
   })
+
+export const getCateParams = (id, sel) =>
+  axios.request({
+    method: 'get',
+    url: `categories/${id}/attributes`,
+    params: {
+      sel: sel
+    }
+  })
