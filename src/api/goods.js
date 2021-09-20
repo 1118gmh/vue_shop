@@ -37,3 +37,28 @@ export const getCateParams = (id, sel) =>
       sel: sel
     }
   })
+export const deleteParams = (cateId, attrId) =>
+  axios.request({
+    method: 'delete',
+    url: `categories/${cateId}/attributes/${attrId}`
+  })
+export const addParams = (id, dataInfo) =>
+  axios.request({
+    method: 'post',
+    url: `categories/${id}/attributes`,
+    data: dataInfo
+  })
+export const editParams = (cateId, attrId, editParamsInfo) =>
+  axios.request({
+    method: 'put',
+    url: `categories/${cateId}/attributes/${attrId}`,
+    data: editParamsInfo
+  })
+export const getParamsById = (cateId, attrId, attrSel) =>
+  axios.request({
+    method: 'get',
+    url: `categories/${cateId}/attributes/${attrId}`,
+    params: {
+      attr_sel: attrSel
+    }
+  })
