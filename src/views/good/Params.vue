@@ -115,10 +115,24 @@
                   v-for="(tag, index) in scope.row.attr_vals"
                   :key="index"
                   closable
+                  @close="handleClose(scope.row, index)"
                   style="margin: 0 5px;"
                 >
                   {{ tag }}
                 </el-tag>
+                <el-input
+                  v-if="scope.row.inputVisible"
+                  v-model="scope.row.inputValue"
+                  ref="saveTagInput"
+                  size="small"
+                  style="width:120px;"
+                  @keyup.enter.native="handleInputConfirm(scope.row)"
+                  @blur="handleInputConfirm(scope.row)"
+                >
+                </el-input>
+                <el-button v-else size="small" @click="showInput(scope.row)"
+                  >+ New Tag</el-button
+                >
               </template>
             </el-table-column>
 
@@ -368,7 +382,7 @@ export default {
     // clickEditOnlyParamsButton(attr) {
     //   console.log(attr)
     // },
-    // 点击删除静态属性按钮
+    // 点击删除属性按钮
     clickDeleteParamsButton(attr) {
       this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
         confirmButtonText: '确定',

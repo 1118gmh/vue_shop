@@ -96,6 +96,30 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
   Vue.component('tree-table', TreeTable) 或者  Vue.use(TreeTable)
   //使用
   根据 api 文档查看使用
+
+
+
+图片的上传和移除，el-upload组件都封装好了，会自动发送ajax请求，然后添加或删除服务器上的图片。但是表单需要提交，需要获取到图片的路径，所以添加成功时要往表单中的图片数组中添加，移除成功时要将表单上的图片数组中移除对应的那一项。
+- 图片上传功能：通过el-upload组件搭结构，指定上传到的服务器端的图片路径，同时还要指定图片上传的请求头中token信息，这样才可以正确上传成功。
+由于这是一个表单，添加商品时要传递上传的图片路径，因此需要获取到上传成功后图片在服务器端的路径。
+成功后，会返回一个响应数据，通过on-success属性监听上传图片成功的事件，获取到图片路径，保存到表单的图片数组pics属性中。
+图片的移除：通过监听移除事件获取到当前图片的路径，然后查找到图片数组中中的对应图片的下标，然后移除
+图片的预览：通过监听预览事件获取图片的绝对路径，并且赋给展示图片对话框中的img的src属性，并且让对话框显示
+
+富文本框：通过vue-quill-editor插件实现
+- 安装依赖 npm install vue-quill-editor
+- 导入富文本编辑器和 它 的样式表
+import VueQuillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+- 注册富文本编辑器为全局可用组件
+Vue.use(VueQuillEditor /* { default global options } */)
+- 组件中使用
+  <quill-editor
+    ref="myQuillEditor"
+    v-model="addForm.goods_introduce"
+  />
 ```
 
 ### notes

@@ -62,3 +62,31 @@ export const getParamsById = (cateId, attrId, attrSel) =>
       attr_sel: attrSel
     }
   })
+export const getGoods = goodsInfo =>
+  axios.request({
+    method: 'get',
+    url: '/goods',
+    params: goodsInfo
+  })
+export const deleteGoods = goodsId =>
+  axios.request({
+    method: 'delete',
+    url: `/goods/${goodsId}`
+  })
+export const addGoods = formInfo =>
+  axios.request({
+    method: 'post',
+    url: '/goods',
+    data: formInfo
+  })
+export const getGoodById = goodsId =>
+  axios.request({
+    method: 'get',
+    url: `goods/${goodsId}`
+  })
+export const editGood = (goodsId, editGoodInfo) =>
+  axios.request({
+    method: 'put',
+    url: `goods/${goodsId}`,
+    data: editGoodInfo
+  })
