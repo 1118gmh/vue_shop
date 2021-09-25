@@ -126,6 +126,35 @@ Vue.use(VueQuillEditor /* { default global options } */)
 
 ```
 1. 省市联动效果实现
+通过级联选择器绑定citydata数据实现
+2. 物流进度查询
+通过elementui组件中的时间轴实现
+```
+
+7. 数据统计
+
+```
+使用到报表，通过echarts插件实现
+- 安装
+- npm install echarts
+- 引入
+- import * as echarts from 'echarts'
+- 使用
+  -
+  <div id="main" style="width:1100px;height:400px;"></div>
+  -
+  async mounted() {
+    // 元素渲染完毕，在mounted中可以获取dom
+    var myChart = echarts.init(document.getElementById('main'))
+    // 获取服务器的返回的报表数据
+    const res = await getData()
+    if (res.meta.status !== 200) {
+      return this.$message.error(res.meta.msg)
+    }
+    // 服务器返回的数据不完整，需要合并配置项
+    const reportData = _.merge(res.data, this.options)
+    myChart.setOption(reportData)
+  }
 ```
 
 ### notes
