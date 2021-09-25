@@ -2,7 +2,11 @@
   <el-container>
     <el-header>
       <div class="header_box">
-        <img src="../assets/heima.png" alt="" />
+        <img
+          src="../assets/logo.png"
+          alt=""
+          style="height:60px;margin-left:10px;margin-ringht:20px;"
+        />
         <span>电商后台管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>

@@ -122,6 +122,12 @@ Vue.use(VueQuillEditor /* { default global options } */)
   />
 ```
 
+6. 订单管理
+
+```
+1. 省市联动效果实现
+```
+
 ### notes
 
 1. 语法处理：eslint 规范+prettier 格式化文件
