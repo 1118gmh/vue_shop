@@ -1,14 +1,14 @@
 const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin')
 module.exports = {
-  devServer: {
-    // 跨域请求：PROXY代理
-    proxy: {
-      '/': {
-        target: 'http://127.0.0.1:8888/api/private/v1/',
-        changeOrigin: true
-      }
-    }
-  },
+  // devServer: {
+  //   // 跨域请求：PROXY代理
+  //   proxy: {
+  //     '/': {
+  //       target: 'http://127.0.0.1:8888/api/private/v1/',
+  //       changeOrigin: true
+  //     }
+  //   }
+  // },
   configureWebpack: config => {
     // config.plugins = []; // 这样会直接将 plugins 置空
     if (process.env.NODE_ENV === 'production') {

@@ -5,7 +5,7 @@ import 'nprogress/nprogress.css'
 
 class AjaxRequest {
   constructor() {
-    this.baseURL = ''
+    this.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
     this.timeout = 3000
     this.validateStatus = function(status) {
       // 自定义成功失败规则：resolve 、 reject(默认以2开头算成功)

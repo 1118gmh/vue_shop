@@ -491,11 +491,13 @@ component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue') //
 
 ### 在本地部署上线
 
-创建一个服务端项目
+创建一个服务端项目 vue_shop_server，并且将打包的 dist 目录复制过来
 
 1. node 创建 web 服务器
 
 ```
+npm install express
+
 const express = require('express')
 const app = express()
 
@@ -534,7 +536,7 @@ app.listen(80,()=>{
     cert: fs.readFileSync('./full_chain.pem'),
     key: fs.readFileSync('./private.key')
   }
-  https.createServe(options,app).listen(443) //要把上面的http协议的80端口注释掉
+  https.createServer(options,app).listen(443) //要把上面的http协议的80端口注释掉
 ```
 
 4. pm2 管理应用
