@@ -1,28 +1,15 @@
 <template>
   <div>
     <!-- 面包屑 -->
-    <BreadCrumb
-      first="首页"
-      second="商品管理"
-      third="商品列表"
-      path="home"
-    ></BreadCrumb>
+    <BreadCrumb first="首页" second="商品管理" third="商品列表" path="home"></BreadCrumb>
     <!-- 卡片 -->
     <el-card>
       <!-- 搜索框 -->
       <el-row style="margin-bottom:15px;">
         <el-col :span="8">
-          <el-input
-            placeholder="请输入内容"
-            v-model="goodsInfo.query"
-            clearable
-            @clear="clearSearchInput"
-          >
+          <el-input placeholder="请输入内容" v-model="goodsInfo.query" clearable @clear="clearSearchInput">
             <template v-slot:append>
-              <el-button
-                icon="el-icon-search"
-                @click="clickSearchButton"
-              ></el-button>
+              <el-button icon="el-icon-search" @click="clickSearchButton"></el-button>
             </template>
           </el-input>
         </el-col>
@@ -34,14 +21,8 @@
       <el-table :data="goods" stripe border>
         <el-table-column type="index" label="#" width="60px"> </el-table-column>
         <el-table-column prop="goods_name" label="商品名称"> </el-table-column>
-        <el-table-column
-          prop="goods_price"
-          label="商品价格（元）"
-          width="120px"
-        >
-        </el-table-column>
-        <el-table-column prop="goods_weight" label="商品重量" width="80px">
-        </el-table-column>
+        <el-table-column prop="goods_price" label="商品价格（元）" width="120px"> </el-table-column>
+        <el-table-column prop="goods_weight" label="商品重量" width="80px"> </el-table-column>
         <el-table-column prop="add_time" label="创建时间" width="170px">
           <template v-slot="scope">
             {{ scope.row.add_time | dateFormat }}
@@ -50,19 +31,9 @@
         <el-table-column prop="" label="操作" width="120px">
           <template v-slot="scope">
             <!-- 编辑按钮 -->
-            <el-button
-              type="primary"
-              icon="el-icon-edit"
-              size="mini"
-              @click="editGood(scope.row.goods_id)"
-            ></el-button>
+            <el-button type="primary" icon="el-icon-edit" size="mini" @click="editGood(scope.row.goods_id)"></el-button>
             <!-- 删除按钮 -->
-            <el-button
-              type="danger"
-              icon="el-icon-delete"
-              size="mini"
-              @click="deleteGood(scope.row.goods_id)"
-            ></el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini" @click="deleteGood(scope.row.goods_id)"></el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -121,10 +92,6 @@ export default {
           }
           this.$message.success('删除成功')
           this.getGoods()
-          this.$message({
-            type: 'success',
-            message: '删除成功!'
-          })
         })
         .catch(() => {
           this.$message({

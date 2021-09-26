@@ -1,23 +1,13 @@
 <template>
   <div>
     <!-- 面包屑导航 -->
-    <BreadCrumb
-      first="首页"
-      second="商品管理"
-      third="添加商品"
-      path="home"
-    ></BreadCrumb>
+    <BreadCrumb first="首页" second="商品管理" third="添加商品" path="home"></BreadCrumb>
     <!-- 卡片区域 -->
     <el-card>
       <!-- 消息提示 -->
       <el-alert title="添加商品信息" type="info" show-icon center> </el-alert>
       <!-- 步骤条 -->
-      <el-steps
-        :space="200"
-        :active="activeIndex - 0"
-        finish-status="success"
-        align-center
-      >
+      <el-steps :space="200" :active="activeIndex - 0" finish-status="success" align-center>
         <el-step title="基本信息"></el-step>
         <el-step title="商品参数"></el-step>
         <el-step title="商品属性"></el-step>
@@ -27,19 +17,8 @@
       </el-steps>
       <!-- tab栏 -->
       <!-- form表单：要包裹tab -->
-      <el-form
-        :model="addForm"
-        :rules="addFormRules"
-        ref="addFormRef"
-        label-width="100px"
-        label-position="top"
-      >
-        <el-tabs
-          v-model="activeIndex"
-          :tab-position="'left'"
-          :before-leave="beforeTabLeave"
-          @tab-click="tabClicked"
-        >
+      <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px" label-position="top">
+        <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave" @tab-click="tabClicked">
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称" prop="goods_name">
               <el-input v-model="addForm.goods_name"></el-input>
@@ -54,60 +33,30 @@
               <el-input v-model="addForm.goods_number" type="number"></el-input>
             </el-form-item>
             <el-form-item label="商品分类" prop="goods_cat">
-              <el-cascader
-                v-model="addForm.goods_cat"
-                :options="cateList"
-                :props="cateProps"
-                @change="handleChange"
-              ></el-cascader>
+              <el-cascader v-model="addForm.goods_cat" :options="cateList" :props="cateProps" @change="handleChange"></el-cascader>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品参数" name="1">
-            <el-form-item
-              :label="item.attr_name"
-              v-for="item in goodManyParams"
-              :key="item.attr_id"
-            >
+            <el-form-item :label="item.attr_name" v-for="item in goodManyParams" :key="item.attr_id">
               <el-checkbox-group v-model="item.attr_vals">
-                <el-checkbox
-                  :label="item2"
-                  v-for="(item2, index) in item.attr_vals"
-                  :key="index"
-                  border
-                ></el-checkbox>
+                <el-checkbox :label="item2" v-for="(item2, index) in item.attr_vals" :key="index" border></el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品属性" name="2">
-            <el-form-item
-              :label="item.attr_name"
-              v-for="item in goodOnlyParams"
-              :key="item.attr_id"
-            >
+            <el-form-item :label="item.attr_name" v-for="item in goodOnlyParams" :key="item.attr_id">
               <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品图片" name="3">
-            <el-upload
-              action="http://127.0.0.1:8888/api/private/v1/upload"
-              :on-preview="handlePreview"
-              :on-remove="handleRemove"
-              :on-success="handleSuccess"
-              list-type="picture"
-              :headers="headerObj"
-            >
+            <el-upload action="http://127.0.0.1:8888/api/private/v1/upload" :on-preview="handlePreview" :on-remove="handleRemove" :on-success="handleSuccess" list-type="picture" :headers="headerObj">
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
-            <quill-editor
-              ref="myQuillEditor"
-              v-model="addForm.goods_introduce"
-            />
+            <quill-editor ref="myQuillEditor" v-model="addForm.goods_introduce" />
             <!-- 添加商品的按钮 -->
-            <el-button type="primary" style="margin-top:15px;" @click="add"
-              >添加商品</el-button
-            >
+            <el-button type="primary" style="margin-top:15px;" @click="add">添加商品</el-button>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -143,18 +92,10 @@ export default {
       },
       // 表单规则
       addFormRules: {
-        goods_name: [
-          { required: true, message: '请输入商品名称', tirgger: 'blur' }
-        ],
-        goods_price: [
-          { required: true, message: '请输入商品价格', tirgger: 'blur' }
-        ],
-        goods_weight: [
-          { required: true, message: '请输入商品重量', tirgger: 'blur' }
-        ],
-        goods_number: [
-          { required: true, message: '请输入商品数量', tirgger: 'blur' }
-        ],
+        goods_name: [{ required: true, message: '请输入商品名称', tirgger: 'blur' }],
+        goods_price: [{ required: true, message: '请输入商品价格', tirgger: 'blur' }],
+        goods_weight: [{ required: true, message: '请输入商品重量', tirgger: 'blur' }],
+        goods_number: [{ required: true, message: '请输入商品数量', tirgger: 'blur' }],
         goods_cat: [{ required: true, message: '请选择商品分类' }]
       },
       // 商品分类列表
@@ -239,8 +180,7 @@ export default {
         }
         // 将每一个attr_vals变为数组
         res.data.forEach(item => {
-          item.attr_vals =
-            item.attr_vals.length === 0 ? [] : item.attr_vals.split(' ')
+          item.attr_vals = item.attr_vals.length === 0 ? [] : item.attr_vals.split(' ')
         })
         this.goodManyParams = res.data
       } else if (this.activeIndex === '2') {

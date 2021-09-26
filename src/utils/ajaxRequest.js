@@ -1,4 +1,6 @@
 import axios from 'axios'
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 // import { Loading } from 'element-ui'
 
 class AjaxRequest {
@@ -20,7 +22,7 @@ class AjaxRequest {
       config => {
         // 每次请求前，将token放到请求中 Authorization（后根据这个属性获取token来判断）
         config.headers.Authorization = sessionStorage.getItem('token')
-
+        NProgress.start()
         // 请求前显示loading
         // if (Object.keys(this.queue).length === 0) {
         // this.toast.service({ fullscreen: true })
@@ -38,6 +40,7 @@ class AjaxRequest {
         // if (Object.keys(this.queue).length === 0) {
         // this.loading.close()
         // }
+        NProgress.done()
         return res.data
       },
       err => Promise.reject(err)

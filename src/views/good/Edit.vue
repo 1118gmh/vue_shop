@@ -1,106 +1,48 @@
 <template>
   <div>
     <!-- 面包屑导航 -->
-    <BreadCrumb
-      first="首页"
-      second="商品管理"
-      third="编辑商品"
-      path="home"
-    ></BreadCrumb>
+    <BreadCrumb first="首页" second="商品管理" third="编辑商品" path="home"></BreadCrumb>
     <el-card>
-      <el-form
-        :model="editGoodInfo"
-        :rules="editGoodFormRules"
-        ref="editFormRef"
-        label-width="100px"
-        label-position="top"
-      >
-        <el-tabs
-          v-model="activeIndex"
-          :tab-position="'left'"
-          :before-leave="beforeTabLeave"
-          @tab-click="tabClicked"
-        >
+      <el-form :model="editGoodInfo" :rules="editGoodFormRules" ref="editFormRef" label-width="100px" label-position="top">
+        <el-tabs v-model="activeIndex" :tab-position="'left'" :before-leave="beforeTabLeave" @tab-click="tabClicked">
           <el-tab-pane label="基本信息" name="0">
             <el-form-item label="商品名称" prop="goods_name">
               <el-input v-model="editGoodInfo.goods_name"></el-input>
             </el-form-item>
             <el-form-item label="商品价格" prop="goods_price">
-              <el-input
-                v-model="editGoodInfo.goods_price"
-                type="number"
-              ></el-input>
+              <el-input v-model="editGoodInfo.goods_price" type="number"></el-input>
             </el-form-item>
             <el-form-item label="商品重量" prop="goods_weight">
-              <el-input
-                v-model="editGoodInfo.goods_weight"
-                type="number"
-              ></el-input>
+              <el-input v-model="editGoodInfo.goods_weight" type="number"></el-input>
             </el-form-item>
             <el-form-item label="商品数量" prop="goods_number">
-              <el-input
-                v-model="editGoodInfo.goods_number"
-                type="number"
-              ></el-input>
+              <el-input v-model="editGoodInfo.goods_number" type="number"></el-input>
             </el-form-item>
             <el-form-item label="商品分类" prop="goods_cat">
-              <el-cascader
-                v-model="editGoodInfo.goods_cat"
-                :options="cateList"
-                :props="cateProps"
-                @change="handleChange"
-              ></el-cascader>
+              <el-cascader v-model="editGoodInfo.goods_cat" :options="cateList" :props="cateProps" @change="handleChange"></el-cascader>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品参数" name="1">
-            <el-form-item
-              :label="item.attr_name"
-              v-for="item in goodManyParams"
-              :key="item.attr_id"
-            >
+            <el-form-item :label="item.attr_name" v-for="item in goodManyParams" :key="item.attr_id">
               <el-checkbox-group v-model="item.attr_vals">
-                <el-checkbox
-                  :label="item2"
-                  v-for="(item2, index) in item.attr_vals"
-                  :key="index"
-                  border
-                ></el-checkbox>
+                <el-checkbox :label="item2" v-for="(item2, index) in item.attr_vals" :key="index" border></el-checkbox>
               </el-checkbox-group>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品属性" name="2">
-            <el-form-item
-              :label="item.attr_name"
-              v-for="item in goodOnlyParams"
-              :key="item.attr_id"
-            >
+            <el-form-item :label="item.attr_name" v-for="item in goodOnlyParams" :key="item.attr_id">
               <el-input v-model="item.attr_vals"></el-input>
             </el-form-item>
           </el-tab-pane>
           <el-tab-pane label="商品图片" name="3">
-            <el-upload
-              action="http://127.0.0.1:8888/api/private/v1/upload"
-              :on-remove="handleRemove"
-              :on-success="handleSuccess"
-              :file-list="fileList"
-              list-type="picture"
-              :headers="headerObj"
-            >
+            <el-upload action="http://127.0.0.1:8888/api/private/v1/upload" :on-remove="handleRemove" :on-success="handleSuccess" :file-list="fileList" list-type="picture" :headers="headerObj">
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
           <el-tab-pane label="商品内容" name="4">
-            <quill-editor
-              ref="myQuillEditor"
-              v-model="editGoodInfo.goods_introduce"
-            />
+            <quill-editor ref="myQuillEditor" v-model="editGoodInfo.goods_introduce" />
             <!-- 添加商品的按钮 -->
-            <el-button
-              type="primary"
-              style="margin-top:15px;"
-              @click="finishEdit"
-              >提交</el-button
-            >
+            <el-button type="primary" style="margin-top:15px;" @click="finishEdit">提交</el-button>
           </el-tab-pane>
         </el-tabs>
       </el-form>
@@ -109,12 +51,7 @@
 </template>
 <script>
 import BreadCrumb from '../../components/BreadCrumb.vue'
-import {
-  getGoodById,
-  getCategories,
-  getCateParams,
-  editGood
-} from '../../api/goods'
+import { getGoodById, getCategories, getCateParams, editGood } from '../../api/goods'
 import _ from 'lodash'
 export default {
   data() {
@@ -123,9 +60,7 @@ export default {
       editGoodInfo: {},
       // 表单规则
       editGoodFormRules: {
-        goods_name: [
-          { required: true, message: '请输入商品名称', tirgger: 'blur' }
-        ],
+        goods_name: [{ required: true, message: '请输入商品名称', tirgger: 'blur' }],
         goods_price: [{ required: true, message: '请输入商品价格' }],
         goods_weight: [{ required: true, message: '请输入商品重量' }],
         goods_number: [{ required: true, message: '请输入商品数量' }],
@@ -249,8 +184,7 @@ export default {
         }
         // 将每一个attr_vals变为数组
         res.data.forEach(item => {
-          item.attr_vals =
-            item.attr_vals.length === 0 ? [] : item.attr_vals.split(' ')
+          item.attr_vals = item.attr_vals.length === 0 ? [] : item.attr_vals.split(' ')
         })
         this.goodManyParams = res.data
       } else if (this.activeIndex === '2') {

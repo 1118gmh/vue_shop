@@ -1,60 +1,30 @@
 <template>
   <div>
     <!-- 面包屑 -->
-    <BreadCrumb
-      first="首页"
-      second="权限管理"
-      third="角色管理"
-      path="home"
-    ></BreadCrumb>
+    <BreadCrumb first="首页" second="权限管理" third="角色管理" path="home"></BreadCrumb>
     <!-- 卡片 -->
     <el-card>
       <!-- 按钮：添加角色 -->
-      <el-button type="primary" class="addRoles" @click="open"
-        >添加角色</el-button
-      >
+      <el-button type="primary" class="addRoles" @click="open">添加角色</el-button>
       <!-- 表格：角色列表信息 -->
       <el-table :data="rolesData" border style="width: 100%">
         <el-table-column type="expand">
           <template v-slot="scope">
-            <el-row
-              :class="['topLine', 'vcenter', index1 === 0 ? 'noLine' : '']"
-              v-for="(item1, index1) in scope.row.children"
-              :key="index1"
-            >
+            <el-row :class="['topLine', 'vcenter', index1 === 0 ? 'noLine' : '']" v-for="(item1, index1) in scope.row.children" :key="index1">
               <el-col :span="5">
-                <el-tag
-                  closable
-                  @close="removeRightById(scope.row, item1.id)"
-                  >{{ item1.authName }}</el-tag
-                >
+                <el-tag closable @close="removeRightById(scope.row, item1.id)">{{ item1.authName }}</el-tag>
                 <i class="el-icon-caret-right"></i>
               </el-col>
               <el-col :span="19">
-                <el-row
-                  :class="['topLine', 'vcenter', index2 === 0 ? 'noLine' : '']"
-                  v-for="(item2, index2) in item1.children"
-                  :key="index2"
-                >
+                <el-row :class="['topLine', 'vcenter', index2 === 0 ? 'noLine' : '']" v-for="(item2, index2) in item1.children" :key="index2">
                   <el-col :span="6">
-                    <el-tag
-                      type="success"
-                      closable
-                      @close="removeRightById(scope.row, item2.id)"
-                    >
+                    <el-tag type="success" closable @close="removeRightById(scope.row, item2.id)">
                       {{ item2.authName }}
                     </el-tag>
                     <i class="el-icon-caret-right"></i>
                   </el-col>
                   <el-col :span="13">
-                    <el-tag
-                      v-for="(item3, index3) in item2.children"
-                      :key="index3"
-                      type="info"
-                      closable
-                      @close="removeRightById(scope.row, item3.id)"
-                      >{{ item3.authName }}</el-tag
-                    >
+                    <el-tag v-for="(item3, index3) in item2.children" :key="index3" type="info" closable @close="removeRightById(scope.row, item3.id)">{{ item3.authName }}</el-tag>
                   </el-col>
                 </el-row>
               </el-col>
@@ -66,44 +36,16 @@
         <el-table-column prop="roleDesc" label="角色描述"> </el-table-column>
         <el-table-column label="操作" width="300px">
           <template v-slot="scope">
-            <el-button
-              size="mini"
-              type="primary"
-              icon="el-icon-edit"
-              @click="openDialog2(scope.row.id)"
-              >编辑</el-button
-            >
-            <el-button
-              size="mini"
-              type="danger"
-              icon="el-icon-delete"
-              @click="deleteRole(scope.row.id)"
-              >删除</el-button
-            >
-            <el-button
-              size="mini"
-              type="warning"
-              icon="el-icon-setting"
-              @click="showAuthDialog(scope.row)"
-              >分配权限</el-button
-            >
+            <el-button size="mini" type="primary" icon="el-icon-edit" @click="openDialog2(scope.row.id)">编辑</el-button>
+            <el-button size="mini" type="danger" icon="el-icon-delete" @click="deleteRole(scope.row.id)">删除</el-button>
+            <el-button size="mini" type="warning" icon="el-icon-setting" @click="showAuthDialog(scope.row)">分配权限</el-button>
           </template>
         </el-table-column>
       </el-table>
     </el-card>
     <!-- 添加角色对话框 -->
-    <el-dialog
-      title="添加用户"
-      :visible.sync="dialogVisible"
-      width="50%"
-      @close="resetDialog"
-    >
-      <el-form
-        ref="addRolesForm"
-        label-width="80px"
-        :model="rolesForm"
-        :rules="rolesRules"
-      >
+    <el-dialog title="添加用户" :visible.sync="dialogVisible" width="50%" @close="resetDialog">
+      <el-form ref="addRolesForm" label-width="80px" :model="rolesForm" :rules="rolesRules">
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="rolesForm.roleName"></el-input>
         </el-form-item>
@@ -119,18 +61,8 @@
     </el-dialog>
 
     <!-- 编辑用户对话框 -->
-    <el-dialog
-      title="编辑用户"
-      :visible.sync="dialogVisible2"
-      width="50%"
-      @close="resetDialog2"
-    >
-      <el-form
-        ref="editRoleForm"
-        label-width="80px"
-        :model="rolesForm2"
-        :rules="rolesRules"
-      >
+    <el-dialog title="编辑用户" :visible.sync="dialogVisible2" width="50%" @close="resetDialog2">
+      <el-form ref="editRoleForm" label-width="80px" :model="rolesForm2" :rules="rolesRules">
         <el-form-item label="角色名称" prop="roleName">
           <el-input v-model="rolesForm2.roleName"></el-input>
         </el-form-item>
@@ -146,23 +78,9 @@
     </el-dialog>
 
     <!-- 分配权限对话框 -->
-    <el-dialog
-      title="分配权限"
-      :visible.sync="authDialog"
-      width="50%"
-      @close="closeAuthDialog"
-    >
+    <el-dialog title="分配权限" :visible.sync="authDialog" width="50%" @close="closeAuthDialog">
       <!-- 树型结构，所有 权限 -->
-      <el-tree
-        ref="tree"
-        :data="authData"
-        show-checkbox
-        node-key="id"
-        :default-expanded-keys="defaultArray"
-        :default-expand-all="true"
-        :default-checked-keys="defaultArray"
-        :props="defaultProps"
-      >
+      <el-tree ref="tree" :data="authData" show-checkbox node-key="id" :default-expanded-keys="defaultArray" :default-expand-all="true" :default-checked-keys="defaultArray" :props="defaultProps">
       </el-tree>
       <span slot="footer" class="dialog-footer">
         <el-button @click="authDialog = false">取 消</el-button>
@@ -173,16 +91,7 @@
 </template>
 <script>
 import BreadCrumb from '@/components/BreadCrumb'
-import {
-  getRights,
-  getRolesData,
-  addRoles,
-  getRoleById,
-  editRole,
-  deleteRole,
-  deleteAuth,
-  fixRoleRights
-} from '@/api/rights'
+import { getRights, getRolesData, addRoles, getRoleById, editRole, deleteRole, deleteAuth, fixRoleRights } from '@/api/rights'
 export default {
   data() {
     return {
@@ -237,8 +146,7 @@ export default {
       const checkedRights = this.$refs.tree.getCheckedKeys()
       // 半选的key
       const halfCheckedRights = this.$refs.tree.getHalfCheckedKeys()
-      const authString =
-        checkedRights.join(',') + ',' + halfCheckedRights.join(',')
+      const authString = checkedRights.join(',') + ',' + halfCheckedRights.join(',')
       console.log(this.roleId, authString)
       const res = await fixRoleRights(this.roleId, authString)
       if (res.meta.status !== 200) {

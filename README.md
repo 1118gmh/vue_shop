@@ -157,6 +157,20 @@ Vue.use(VueQuillEditor /* { default global options } */)
   }
 ```
 
+8. 发送请求时的进度条特效
+
+```
+引入第三方插件nprogress
+- 安装
+  npm i nprogress --save
+- 引入
+  import NProgress from 'nprogress'
+  import 'nprogress/nprogress.css'
+- 使用
+  NProgress.start()
+  NProgress.done()
+```
+
 ### notes
 
 1. 语法处理：eslint 规范+prettier 格式化文件
@@ -208,4 +222,328 @@ Vue.use(Buttom)  // 通过标签使用
 
 Vue.prototype.$message = Message  //挂载到组件上使用
 Vue.prototype.$confirm = Confirm
+```
+
+### 项目优化
+
+1. 生成打包报告
+
+```
+生成打包报告
+- 命令行生成：vue-cli-serve build --report
+- vue ui界面生成：运行build，查看控制台和分析，进行相关优化
+
+```
+
+2. 生产阶段 console 去除
+
+```
+可能会出现console的警告，需要在生产环境中配置babel-plugin-transform-remove-console插件
+
+  npm i babel-plugin-transform-remove-console --save-dev
+  然后在babel.config.js中配置plugin
+  module.exports = {
+    plugins: ['transform-remove-console']
+  }
+  这样会导致在开发阶段和生产阶段都生效，也就是所，开发阶段console的话打印不出消息了，
+  因此需要这样修改
+    // 这是项目发布阶段用到的babel插件
+    const prodPlugins = []
+    // 先判断当前的环境是不是生产阶段，是就添加这个插件
+    if (process.env.NODE_ENV === 'production') {
+      prodPlugins.push('transform-remove-console')
+    }
+    module.exports = {
+      // 将其解构到plugins配置中
+      plugins: [...prodPlugins]
+    }
+
+```
+
+3. 通过 chainWebpack 自定义打包入口
+
+```
+不配置的话，默认情况下，开发环境和生产环境的打包入口都是main.js
+
+配置自己的打包入口：
+在vue.config.js中配置：
+module.exports = {
+  chainWebpack: config => {
+    config.when(process.env.NODE_ENV === 'production', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-prod.js')
+    })
+    config.when(process.env.NODE_ENV === 'development', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-dev.js')
+    })
+  }
+}
+
+```
+
+4. 使用 externals 加载外部 CDN 资源
+
+```
+1. 在生产环境中配置externals，让其在打包的时候，import资源时不打包，直接到全局上查找对应的对象（全局上的对象通过在public文件中的index.html中引入cdn外部资源）
+module.exports = {
+  chainWebpack: config => {
+    config.when(process.env.NODE_ENV === 'production', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-prod.js')
+      config.set('externals', {
+        vue: 'Vue',
+        'vue-router': 'VueRouter',
+        axios: 'axios',
+        lodash: '_',
+        echarts: 'echarts',
+        nprogress: 'NProgress'
+      })
+    })
+    config.when(process.env.NODE_ENV === 'development', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-dev.js')
+    })
+  }
+}
+2. 在生产环境中的main文件中，import的样式可以注释掉，通过下方在public中引入
+    <!-- 引入富文本编辑器的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.bubble.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.core.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.snow.min.css" rel="stylesheet" />
+    <!-- 引入进度条的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.css" rel="stylesheet" />
+3. 引入所需要的外部资源js文件
+    <!-- 引入外部js资源，让其在window上挂载对象，通过配置external来找到全局上的对象 -->
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/vue-router/3.5.1/vue-router.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.2/echarts.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.js"></script>
+
+对于element-ui的cdn引入方式，与其他不同，它不能external；
+- 第一步，把main-prop.js中的导入element-ui的组件、样式注释掉
+- 第二步，在index.html头部，通过cdn加载element-ui的js和css样式
+<link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/theme-chalk/index.css" rel="stylesheet">
+<script src="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/index.js"></script>
+
+但是我测试了这种方式用不了，不知道为啥
+
+明天试试html-webpack-externals-plugin插件实现
+
+今天用html-webpack-externals-plugin插件实现上面的externals加载cdn资源
+1. 将所有import的样式注释掉（只需要生产环境注释掉，开发环境下import就好），并且在html中引入cdn样式资源，（结合下一个优化方案：通过挂载prod属性判断是否引用这些外部cdn资源）
+      <!-- 引入富文本编辑器的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.bubble.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.core.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.snow.min.css" rel="stylesheet" />
+    <!-- 引入进度条的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.css" rel="stylesheet" />
+    <!-- 引入element-ui的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/theme-chalk/index.css" rel="stylesheet" />
+
+2. 配置开发环境和生产环境的入口文件
+    chainWebpack: config => {
+    config.when(process.env.NODE_ENV === 'production', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-prod.js')
+    })
+    config.when(process.env.NODE_ENV === 'development', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-dev.js')
+    })
+  }
+
+3. 通过html-webpack-externals-plugin插件在生产环境中配置这个插件，指定external的模块和cdn路径和全局名称
+    const HtmlWebpackExternalsPlugin = require('html-webpack-externals-plugin')
+
+    configureWebpack: config => {
+    // config.plugins = []; // 这样会直接将 plugins 置空
+    if (process.env.NODE_ENV === 'production') {
+      return {
+        // return的话会合并plugins
+        plugins: [
+          new HtmlWebpackExternalsPlugin({
+            externals: [
+              {
+                module: 'vue',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/vue/2.6.14/vue.min.js',
+                global: 'Vue'
+              },
+              {
+                module: 'vue-router',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/vue-router/3.5.1/vue-router.min.js',
+                global: 'VueRouter'
+              },
+              {
+                module: 'axios',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js',
+                global: 'axios'
+              },
+              {
+                module: 'lodash',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/lodash.js/4.17.21/lodash.min.js',
+                global: '_'
+              },
+              {
+                module: 'echarts',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/echarts/5.1.2/echarts.min.js',
+                global: 'echarts'
+              },
+              {
+                module: 'nprogress',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.js',
+                global: 'NProgress'
+              },
+              {
+                module: 'element-ui',
+                entry: 'https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/index.js',
+                global: 'ElementUI'
+              }
+            ]
+          })
+        ]
+      }
+    }
+  },
+  值得注意的是，element-ui的配置：除了要上面一步这样通过插件引入element-ui组件,而且还要在生产环境中删除import的element-ui内容
+    // import ElementUI from 'element-ui'
+    // Vue.use(ElementUI)
+  不然会报错
+
+```
+
+4. 首页内容定制
+
+```
+主要是为了实现
+- 控制渲染页面的标题
+- 按需加载外部cdn资源
+
+实现步骤：
+1. 通过html插件，给ta新增一个属性isProd，挂载到了htmlWebpackPlugin.options上,发布阶段是true，开发阶段是true
+    chainWebpack: config => {
+    config.when(process.env.NODE_ENV === 'production', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-prod.js')
+      // 通过html插件，给ta新增一个属性isProd，挂载到了htmlWebpackPlugin.options上,发布阶段是true，开发阶段是true
+      config.plugin('html').tap(args => {
+        args[0].isProd = true
+        return args
+      })
+    })
+    config.when(process.env.NODE_ENV === 'development', config => {
+      config
+        .entry('app')
+        .clear()
+        .add('./src/main-dev.js')
+      // 通过html插件，给ta新增一个属性isProd,发布阶段是true，开发阶段是true
+      config.plugin('html').tap(args => {
+        args[0].isProd = false
+        return args
+      })
+    })
+  }
+2. 在index.html中，通过<%= %>来配置值，通过<% %>来配置逻辑根据htmlWebpackPlugin.options.isProd属性判断开发、生产阶段
+
+    <title><%= htmlWebpackPlugin.options.isProd ? '':'dev-' %>电商后台管理系统</title>
+
+    <% if(htmlWebpackPlugin.options.isProd){ %>
+    <!-- 引入富文本编辑器的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.bubble.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.core.min.css" rel="stylesheet" />
+    <link href="https://cdn.bootcdn.net/ajax/libs/quill/1.3.4/quill.snow.min.css" rel="stylesheet" />
+    <!-- 引入进度条的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/nprogress/0.2.0/nprogress.min.css" rel="stylesheet" />
+    <!-- 引入element-ui的样式 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/element-ui/2.15.3/theme-chalk/index.css" rel="stylesheet" />
+    <% } %>
+```
+
+5. 路由的懒加载
+
+```
+需要配置babel插件：@babel/plugin-syntax-dynamic-import
+- npm install --save-dev @babel/plugin-syntax-dynamic-import
+- 在babel.config.js中配置
+  {
+  "plugins": ["@babel/plugin-syntax-dynamic-import"]
+  }
+这样操作之后才可以正常解析懒加载语法
+component: () => import(/* webpackChunkName: "about" */ '../views/Login.vue') //webpackChunkName是分组，分到同一组的会被一起解析
+
+```
+
+### 在本地部署上线
+
+创建一个服务端项目
+
+1. node 创建 web 服务器
+
+```
+const express = require('express')
+const app = express()
+
+app.use(express.static('./dist'))
+
+app.listen(80,()=>{
+  console.log('server running at http://127.0.0.1')
+})
+```
+
+2. 开启 gzip 压缩
+
+```
+npm install compression -S
+
+const express = require('express')
+const compression = require('compression')
+const app = express()
+
+app.use(compression()) // 写在静态资源之前
+app.use(express.static('./dist'))
+
+app.listen(80,()=>{
+  console.log('server running at http://127.0.0.1')
+})
+```
+
+3. 配置 http 服务
+
+```
+1. 申请ssl证书，freessl网站免费申请，会获得一个公钥和一个私钥
+2. 在后台项目中导入证书
+  const https = require('https')
+  const fs = require('fs')
+  const options = {
+    cert: fs.readFileSync('./full_chain.pem'),
+    key: fs.readFileSync('./private.key')
+  }
+  https.createServe(options,app).listen(443) //要把上面的http协议的80端口注释掉
+```
+
+4. pm2 管理应用
+
+```
+npm install pm2 -g
+pm2 start ...
+pm2 ls
+pm2 restart ...
+pm2 stop ...
+pm2 delete ...
 ```

@@ -2,11 +2,7 @@
   <el-container>
     <el-header>
       <div class="header_box">
-        <img
-          src="../assets/logo.png"
-          alt=""
-          style="height:60px;margin-left:10px;margin-ringht:20px;"
-        />
+        <img src="../assets/logo.png" alt="" style="height:60px;margin-left:10px;margin-ringht:20px;" />
         <span>电商后台管理系统</span>
       </div>
       <el-button type="info" @click="logout">退出</el-button>
@@ -34,11 +30,7 @@
               </template>
               <template v-for="item2 in item.children">
                 <!-- 二级菜单 -->
-                <el-menu-item
-                  :index="'/' + item2.path"
-                  :key="item2.id"
-                  @click="activeChangePath('/' + item2.path)"
-                >
+                <el-menu-item :index="'/' + item2.path" :key="item2.id" @click="activeChangePath('/' + item2.path)">
                   <template slot="title">
                     <i class="el-icon-menu"></i>
                     <span>{{ item2.authName }}</span>
